@@ -6,14 +6,7 @@ import { useSDK } from "@metamask/sdk-react";
 import Header from "./Header";
 import mintNFtAbi from "../abis/mintNFtAbi.json";
 // FILES
-export interface MyOutletContext {
-  account: string;
-  web3: Web3;
-  mintNftContract: any;
-  // Contract<ContractAbi>;
-  // 최상위 컴포넌트에 인터페이스
-}
-// 타입을 정의해줘야하는것은 안에 제네릭으로 되어있음.
+
 const Layout: FC = () => {
   const { provider } = useSDK();
 
@@ -49,7 +42,7 @@ const Layout: FC = () => {
   // }, [web3]);
 
   return (
-    <div className="bg-blue-400 min-h-screen max-w-screen-md mx-auto">
+    <div className="bg-blue-400 min-h-screen max-w-screen-md mx-auto flex flex-col">
       <Header account={account} setAccount={setAccount} />
       <Outlet context={{ mintNftContract, setMintNftContract, account }} />
     </div>
