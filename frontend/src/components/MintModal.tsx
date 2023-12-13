@@ -5,16 +5,26 @@ import axios from "axios";
 
 interface MintModalProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  metadataArray: NftMetadata[];
+  setMetadataArray: Dispatch<SetStateAction<NftMetadata[]>>;
 }
 
-const MintModal: FC<MintModalProps> = ({ setIsOpen }) => {
+const MintModal: FC<MintModalProps> = ({
+  setIsOpen,
+  metadataArray,
+  setMetadataArray,
+}) => {
   const { mintNftContract, account } = useOutletContext<MyOutletContext>();
 
   const [metadata, setMetadata] = useState<NftMetadata>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onClickMint = async () => {
     try {
       if (!mintNftContract || !account) return;
+
+      setIsLoading(true);
+
       await mintNftContract.methods.mintNFT().send({ from: account });
       // @ts-expect-error
       const balance = await mintNftContract.methods.balanceOf(account).call();
@@ -32,8 +42,12 @@ const MintModal: FC<MintModalProps> = ({ setIsOpen }) => {
       const response = await axios.get(metadataURI);
 
       setMetadata(response.data);
+      setMetadataArray([response.data, ...metadataArray]);
+
+      setIsLoading(false);
     } catch (error) {
       console.warn("Errrr");
+      setIsLoading(false);
     }
   };
 
@@ -79,7 +93,11 @@ const MintModal: FC<MintModalProps> = ({ setIsOpen }) => {
             {" "}
             <div>NFT를 민트하시겠습니까?</div>
             <div className="text-center mt-3">
-              <button onClick={onClickMint}>확인</button>
+              {isLoading ? (
+                <div>로딩중</div>
+              ) : (
+                <button onClick={onClickMint}>확인</button>
+              )}
             </div>
           </>
         )}

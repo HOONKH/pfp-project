@@ -1,15 +1,45 @@
 import { FC, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { MyOutletContext } from "../types";
+import { MyOutletContext, NftMetadata } from "../types";
 import MintModal from "../components/MintModal";
+
+import axios from "axios";
 
 const My: FC = () => {
   const { mintNftContract, account } = useOutletContext<MyOutletContext>();
   // Layout 에 인터페이스 export로 받아옴.
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  useEffect(() => {
-    console.log(mintNftContract);
-  }, [mintNftContract]);
+  const [metadataArray, setMetadataArray] = useState<NftMetadata[]>([]);
+
+  const getMyNft = async () => {
+    try {
+      if (!mintNftContract || !account) return;
+
+      //@ts-expect-error
+      const balance = await mintNftContract.methods.balanceOf(account).call();
+
+      let temp: NftMetadata[] = [];
+
+      for (let i = 0; i < Number(balance); i++) {
+        const tokenId = await mintNftContract.methods
+          //@ts-expect-error
+          .tokenOfOwnerByIndex(account, i)
+          .call();
+
+        const metadataURI: string = await mintNftContract.methods
+          //@ts-expect-error
+          .tokenURI(tokenId)
+          .call();
+
+        const response = await axios.get(metadataURI);
+
+        temp.push(response.data);
+      }
+      setMetadataArray(temp);
+    } catch (error) {
+      console.warn("err");
+    }
+  };
 
   const onClickMintModal = () => {
     if (!account) return;
@@ -17,16 +47,41 @@ const My: FC = () => {
     setIsOpen(true);
   };
 
+  useEffect(() => {
+    getMyNft();
+  }, [mintNftContract, account]);
+
+  useEffect(() => {
+    console.log(metadataArray);
+  }, [metadataArray]);
+
   return (
     <>
-      <div className="bg-green-500 grow">
-        <div className="bg-red-500 text-right p-2">
+      <div className=" grow">
+        <div className="text-right p-2">
           <button className="hover:text-gray-500" onClick={onClickMintModal}>
             Mint
           </button>
         </div>
+        <div className="text-center py-8">
+          <h1 className="font-bold text-2xl">My NFTs</h1>
+        </div>
+        <ul className="p-8 grid grid-cols-3 gap-2">
+          {metadataArray?.map((v, i) => (
+            <li key={i}>
+              <img className="w-42 h-42" src={v.image} alt={v.name} />
+              <div>{v.name}</div>
+            </li>
+          ))}
+        </ul>
       </div>
-      {isOpen && <MintModal setIsOpen={setIsOpen} />}
+      {isOpen && (
+        <MintModal
+          setIsOpen={setIsOpen}
+          metadataArray={metadataArray}
+          setMetadataArray={setMetadataArray}
+        />
+      )}
     </>
   );
 };
