@@ -9,6 +9,8 @@ export interface MyOutletContext {
 }
 // 타입을 정의해줘야하는것은 안에 제네릭으로 되어있음.
 export interface NftMetadata {
+  tokenId?: number;
+  // 있을수도 있고 없을수도있고.
   name: string;
   image: string;
   description: string;
@@ -19,3 +21,7 @@ export interface NftMetadata {
 }
 // 객체의 배열 표현 위에처럼
 // 인터페이스는 앞에 I를 붙임,.
+
+// export interface NftMetadataTokenId extends NftMetadata {
+//   tokenId: number;
+// }

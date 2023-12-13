@@ -4,6 +4,7 @@ import { MyOutletContext, NftMetadata } from "../types";
 import MintModal from "../components/MintModal";
 
 import axios from "axios";
+import MyNftCard from "../components/MyNftCard";
 
 const My: FC = () => {
   const { mintNftContract, account } = useOutletContext<MyOutletContext>();
@@ -33,7 +34,8 @@ const My: FC = () => {
 
         const response = await axios.get(metadataURI);
 
-        temp.push(response.data);
+        temp.push({ ...response.data, tokenId: Number(tokenId) });
+        // 토큰아이디 포함.
       }
       setMetadataArray(temp);
     } catch (error) {
@@ -68,10 +70,13 @@ const My: FC = () => {
         </div>
         <ul className="p-8 grid grid-cols-3 gap-2">
           {metadataArray?.map((v, i) => (
-            <li key={i}>
-              <img className="w-42 h-42" src={v.image} alt={v.name} />
-              <div>{v.name}</div>
-            </li>
+            <MyNftCard
+              key={i}
+              image={v.image}
+              name={v.name}
+              tokenId={v.tokenId!}
+            />
+            // ! 존재한다
           ))}
         </ul>
       </div>
