@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { MyOutletContext, NftMetadata } from "../types";
 import MintModal from "../components/MintModal";
 
@@ -11,6 +11,7 @@ const My: FC = () => {
   // Layout 에 인터페이스 export로 받아옴.
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [metadataArray, setMetadataArray] = useState<NftMetadata[]>([]);
+  const navigate = useNavigate();
 
   const getMyNft = async () => {
     try {
@@ -54,8 +55,10 @@ const My: FC = () => {
   }, [mintNftContract, account]);
 
   useEffect(() => {
-    console.log(metadataArray);
-  }, [metadataArray]);
+    if (account) return;
+
+    navigate("/");
+  }, [account]);
 
   return (
     <>
@@ -68,7 +71,7 @@ const My: FC = () => {
         <div className="text-center py-8">
           <h1 className="font-bold text-2xl">My NFTs</h1>
         </div>
-        <ul className="p-8 grid grid-cols-3 gap-2">
+        <ul className="p-8 grid grid-cols-2 gap-2">
           {metadataArray?.map((v, i) => (
             <MyNftCard
               key={i}
