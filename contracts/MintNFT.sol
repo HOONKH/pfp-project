@@ -29,3 +29,4 @@ contract MintNFT is ERC721Enumerable {
         }
     
 }
+// 판매에 대한 수수료 설정 가능.
