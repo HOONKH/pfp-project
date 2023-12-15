@@ -5,12 +5,15 @@ import MintModal from "../components/MintModal";
 
 import axios from "axios";
 import MyNftCard from "../components/MyNftCard";
+import { SALE_NFT_CONTRACT } from "../abis/ContractAddress";
 
 const My: FC = () => {
-  const { mintNftContract, account } = useOutletContext<MyOutletContext>();
+  const { mintNftContract, account, saleNftContract } =
+    useOutletContext<MyOutletContext>();
   // Layout 에 인터페이스 export로 받아옴.
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [metadataArray, setMetadataArray] = useState<NftMetadata[]>([]);
+  const [saleStatus, setSaleStatus] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const getMyNft = async () => {
@@ -44,10 +47,38 @@ const My: FC = () => {
     }
   };
 
+  const getSaleStatus = async () => {
+    try {
+      const isApproved: boolean = await mintNftContract.methods
+        //@ts-expect-error
+        .isApprovedForAll(account, SALE_NFT_CONTRACT)
+        .call();
+
+      setSaleStatus(isApproved);
+      // console.log(isApproved); 콘솔로그로 True/False 확인.
+    } catch (error) {}
+  };
+
   const onClickMintModal = () => {
     if (!account) return;
 
     setIsOpen(true);
+  };
+
+  const onClickSaleStatus = async () => {
+    try {
+      await mintNftContract.methods
+        // @ts-expect-error
+        .setApprovalForAll(SALE_NFT_CONTRACT, !saleStatus)
+        .send({
+          from: account,
+        });
+
+      setSaleStatus(!saleStatus);
+      // (철회)
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -60,10 +91,18 @@ const My: FC = () => {
     navigate("/");
   }, [account]);
 
+  useEffect(() => {
+    if (!account) return;
+    getSaleStatus();
+  }, [account]);
+
   return (
     <>
       <div className=" grow">
-        <div className="text-right p-2">
+        <div className="flex justify-between p-2">
+          <button className="hover:text-gray-500" onClick={onClickSaleStatus}>
+            Sale Approved:{saleStatus ? <span>True</span> : <span>False</span>}
+          </button>
           <button className="hover:text-gray-500" onClick={onClickMintModal}>
             Mint
           </button>
@@ -78,6 +117,7 @@ const My: FC = () => {
               image={v.image}
               name={v.name}
               tokenId={v.tokenId!}
+              SaleStatus={saleStatus}
             />
             // ! 존재한다
           ))}

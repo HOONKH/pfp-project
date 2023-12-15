@@ -4,6 +4,7 @@ export interface MyOutletContext {
   account: string;
   web3: Web3;
   mintNftContract: Contract<ContractAbi>;
+  saleNftContract: Contract<ContractAbi>;
   // Contract<ContractAbi>;
   // 최상위 컴포넌트에 인터페이스
 }

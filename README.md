@@ -1,3 +1,4 @@
 # PFP React-TS
 
-Contract-Address : 0xe7E219cBaA8886Ac5D3141AdecE453E25D369aF5
+Mint NFT Contract-Address : 0xe7E219cBaA8886Ac5D3141AdecE453E25D369aF5
+Sale NFT Contract-Address : 0x5aF26C9ea864f5d2cB24eEAb62dDb1B48055247b

@@ -5,6 +5,8 @@ import { useSDK } from "@metamask/sdk-react";
 // HOOKS
 import Header from "./Header";
 import mintNFtAbi from "../abis/mintNFtAbi.json";
+import saleNftAbi from "../abis/saleNftAbi.json";
+import { MINT_NFT_CONTRACT, SALE_NFT_CONTRACT } from "../abis/ContractAddress";
 // FILES
 
 const Layout: FC = () => {
@@ -13,6 +15,7 @@ const Layout: FC = () => {
   const [web3, setWeb3] = useState<Web3>();
   const [account, setAccount] = useState<string>("");
   const [mintNftContract, setMintNftContract] = useState<any>(); // <Contract<ContractAbi>> 제네릭안에 제네릭
+  const [saleNftContract, setSaleNftContract] = useState<any>(); //
 
   useEffect(() => {
     if (!provider) return;
@@ -23,12 +26,8 @@ const Layout: FC = () => {
   useEffect(() => {
     if (!web3) return;
 
-    setMintNftContract(
-      new web3.eth.Contract(
-        mintNFtAbi,
-        "0xe7E219cBaA8886Ac5D3141AdecE453E25D369aF5"
-      )
-    );
+    setMintNftContract(new web3.eth.Contract(mintNFtAbi, MINT_NFT_CONTRACT));
+    setSaleNftContract(new web3.eth.Contract(saleNftAbi, SALE_NFT_CONTRACT));
   }, [web3]);
 
   // useEffect(() => {
@@ -44,7 +43,15 @@ const Layout: FC = () => {
   return (
     <div className=" min-h-screen max-w-screen-md mx-auto flex flex-col">
       <Header account={account} setAccount={setAccount} />
-      <Outlet context={{ mintNftContract, setMintNftContract, account }} />
+      <Outlet
+        context={{
+          mintNftContract,
+          setMintNftContract,
+          account,
+          saleNftContract,
+          web3,
+        }}
+      />
     </div>
   );
 };

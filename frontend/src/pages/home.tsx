@@ -58,12 +58,14 @@ const Home: FC = () => {
 
           const response = await axios.get(metadataURI);
 
-          temp.push({ ...response.data, tokenId: searchTokenId });
+          temp.push({ ...response.data, tokenId: searchTokenId - i });
+          // 임시배열에 리스폰스데이터 NFt에대한아이디도 필요해서 tokenId. 경로에 맞게끔 -i
         }
       }
 
       setSearchTokenId(searchTokenId - GET_AMOUNT);
       setMetadataArray([...metadataArray, ...temp]);
+      // 계속해서 추가하는 스프레드
     } catch (error) {
       console.error(error);
     }
@@ -83,6 +85,7 @@ const Home: FC = () => {
     observe();
 
     return () => observer.current?.disconnect();
+    // 기존에 인터섹션 옵저버 끊고 다시 탐지를해줘야함. 기준이 metadataArray
   }, [metadataArray]);
 
   useEffect(() => {
